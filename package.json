@@ -1,0 +1,75 @@
+{
+  "name": "hyperapp-mqtt",
+  "version": "0.0.0",
+  "description": "MQTT sub / fx for hyperapp",
+  "main": "index.js",
+  "scripts": {
+    "clean": "npx rimraf coverage dist node_modules",
+    "format": "prettier --write '{src,test}/**/*.js'",
+    "format:check": "prettier --list-different {src,test}/**/*.js",
+    "lint": "eslint {src,test}/**/*.js",
+    "test": "jest --coverage --no-cache",
+    "bundle": "rollup -i src/index.js -o dist/hyperappMqtt.js -m -f umd -n hyperappMqtt",
+    "minify": "uglifyjs dist/hyperappMqtt.js -o dist/hyperappMqtt.js -mc pure_funcs=['Object.defineProperty'] --source-map includeSources,url=hyperappMqtt.js.map",
+    "check": "npm run format:check && npm run lint && npm t",
+    "build": "npm run check && npm run bundle && npm run minify",
+    "prepare": "npm run build",
+    "release": "./pre-flight-tests && npm run clean && npm i && ./pre-flight-tests && git tag $npm_package_version && git push && git push --tags && npm publish --tag latest"
+  },
+  "dependencies": {
+    "paho-mqtt": "1.1.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.8.7",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^5.16.0",
+    "eslint-plugin-compat": "^3.5.1",
+    "jest": "^24.9.0",
+    "jsdom": "^14.1.0",
+    "prettier": "^1.19.1",
+    "rollup": "^1.32.1",
+    "uglify-es": "^3.3.9"
+  },
+  "prettier": {
+    "semi": true
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "plugins": [
+      "compat"
+    ],
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "env": {
+      "browser": true
+    },
+    "rules": {
+      "no-use-before-define": "error",
+      "compat/compat": "error",
+      "no-console": "off"
+    },
+    "settings": {
+      "polyfills": [
+        "URLSearchParams"
+      ]
+    }
+  },
+  "keywords": [
+    "mqtt",
+    "hyperapp"
+  ],
+  "author": "Shish <webmaster@shishnet.org>",
+  "license": "MIT",
+  "repository": "shish/hyperapp-mqtt",
+  "homepage": "https://github.com/shish/hyperapp-mqtt",
+  "bugs": {
+    "url": "https://github.com/shish/hyperapp-mqtt/issues"
+  }
+}

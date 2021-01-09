@@ -7,15 +7,21 @@ export function getOpenMQTT(props) {
   if (!connection) {
     connection = {
       socket: mqtt.connect(props.url),
-      listeners: {}
+      connect_listeners: [],
+      topic_listeners: {},
+      close_listeners: []
     };
     connection.socket.on("connect", function() {
-      Object.keys(connection.listeners).map(t =>
+      Object.keys(connection.topic_listeners).map(t =>
         connection.socket.subscribe(t)
       );
+      connection.connect_listeners.map(l => l());
     });
     connection.socket.on("message", function(topic, _payload, packet) {
-      connection.listeners[topic](packet);
+      connection.topic_listeners[topic](packet);
+    });
+    connection.socket.on("close", function() {
+      connection.close_listeners.map(l => l());
     });
     mqttConnections[props.url] = connection;
   }
@@ -32,14 +38,22 @@ export function closeMQTT(props) {
 function mqttListenEffect(dispatch, props) {
   var connection = getOpenMQTT(props);
 
-  connection.listeners[props.topic] = dispatch.bind(null, props.message);
+  connection.topic_listeners[props.topic] = dispatch.bind(null, props.message);
   if (connection.socket.connected) {
     connection.socket.subscribe(props.topic);
   }
 
+  if (props.connect) {
+    connection.connect_listeners.push(dispatch.bind(null, props.connect));
+  }
+  if (props.close) {
+    connection.close_listeners.push(dispatch.bind(null, props.close));
+  }
+
   return function() {
-    delete connection.listeners[props.topic];
-    if (connection.listeners.length === 0) {
+    // TODO: remove our connect & close listeners when we unsubscribe
+    delete connection.topic_listeners[props.topic];
+    if (connection.topic_listeners.length === 0) {
       closeMQTT(props);
     }
   };

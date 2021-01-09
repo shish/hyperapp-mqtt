@@ -1,4 +1,4 @@
-import mqtt from 'mqtt';
+import mqtt from "mqtt";
 
 var mqttConnections = {};
 // https://test.mosquitto.org
@@ -9,12 +9,14 @@ export function getOpenMQTT(props) {
       socket: mqtt.connect(props.url), // new Paho.MQTT.Client(props.url),
       listeners: {}
     };
-    connection.socket.on('connect', function() {
-      Object.keys(connection.listeners).map(t => connection.socket.subscribe(t));
-    })
-    connection.socket.on('message', function(topic, payload, packet) {
-      connection.listeners[topic](payload.toString());
-    })
+    connection.socket.on("connect", function() {
+      Object.keys(connection.listeners).map(t =>
+        connection.socket.subscribe(t)
+      );
+    });
+    connection.socket.on("message", function(topic, _payload, packet) {
+      connection.listeners[topic](packet);
+    });
     mqttConnections[props.url] = connection;
   }
   return connection;
@@ -30,8 +32,8 @@ export function closeMQTT(props) {
 function mqttListenEffect(dispatch, props) {
   var connection = getOpenMQTT(props);
 
-  connection.listeners[props.topic] = dispatch.bind(null, props.message)
-  if(connection.socket.connected) {
+  connection.listeners[props.topic] = dispatch.bind(null, props.message);
+  if (connection.socket.connected) {
     connection.socket.subscribe(props.topic);
   }
 

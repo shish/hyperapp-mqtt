@@ -1,6 +1,6 @@
 {
   "name": "hyperapp-mqtt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MQTT sub / fx for hyperapp",
   "main": "dist/hyperappMqtt.js",
   "module": "src/index.js",
@@ -18,7 +18,7 @@
     "release": "./pre-flight-tests && npm run clean && npm i && ./pre-flight-tests && git tag $npm_package_version && git push && git push --tags && npm publish --tag latest"
   },
   "dependencies": {
-    "paho-mqtt": "1.1.0"
+    "mqtt": "^4.2.6"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.8.7",

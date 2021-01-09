@@ -5,7 +5,7 @@ Very WIP
 
 Usage:
 ```
-import {MQTTListen} from "hyperapp-mqtt";
+import {MQTTSubscribe, MQTTPublish} from "hyperapp-mqtt";
 
 ...
 ```

@@ -1,24 +1,35 @@
-import { getOpenMQTT, closeMQTT, MQTTListen } from "../src";
+import { getOpenMQTT, closeMQTT, MQTTSubscribe, MQTTPublish } from "../src";
 
-describe("MQTTListen", () => {
+let props = {
+  url: "ws://test.mosquitto.org/mqtt",
+  topic: "test/hyperapp-mqtt"
+};
+
+describe("MQTTSubscribe", () => {
   it("should initialise", () => {
-    MQTTListen({ url: "ws://test.mosquitto.org/mqtt" });
+    MQTTSubscribe(props);
+  });
+});
+
+describe("MQTTPublish", () => {
+  it("should initialise", () => {
+    MQTTPublish(props);
   });
 });
 
 describe("Connections", () => {
   it("should open", () => {
-    getOpenMQTT({ url: "ws://test.mosquitto.org/mqtt" });
+    getOpenMQTT(props);
   });
   it("shouldn't duplicate", () => {
-    let a = getOpenMQTT({ url: "ws://test.mosquitto.org/mqtt" });
-    let b = getOpenMQTT({ url: "ws://test.mosquitto.org/mqtt" });
+    let a = getOpenMQTT(props);
+    let b = getOpenMQTT(props);
     expect(a).toEqual(b);
   });
   it("should close", () => {
-    let a = getOpenMQTT({ url: "ws://test.mosquitto.org/mqtt" });
-    closeMQTT({ url: "ws://test.mosquitto.org/mqtt" });
-    let b = getOpenMQTT({ url: "ws://test.mosquitto.org/mqtt" });
+    let a = getOpenMQTT(props);
+    closeMQTT(props);
+    let b = getOpenMQTT(props);
     expect(a).not.toEqual(b);
   });
 });

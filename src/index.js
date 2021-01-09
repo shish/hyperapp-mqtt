@@ -35,7 +35,7 @@ export function closeMQTT(props) {
   delete mqttConnections[props.url];
 }
 
-function mqttListenEffect(dispatch, props) {
+function mqttSubscribeEffect(dispatch, props) {
   var connection = getOpenMQTT(props);
 
   connection.topic_listeners[props.topic] = dispatch.bind(null, props.message);
@@ -59,6 +59,23 @@ function mqttListenEffect(dispatch, props) {
   };
 }
 
-export function MQTTListen(props) {
-  return [mqttListenEffect, props];
+export function MQTTSubscribe(props) {
+  return [mqttSubscribeEffect, props];
+}
+
+function mqttPublishEffect(dispatch, props) {
+  var connection = getOpenMQTT(props);
+  function sendMessage() {
+    connection.socket.publish(props.topic, props.payload);
+    // connection.socket.removeEventListener("open", sendMessage);
+  }
+  //if (connection.socket.readyState === WebSocket.CONNECTING) {
+  //  connection.socket.addEventListener("open", sendMessage)
+  //} else {
+  sendMessage();
+  //}
+}
+
+export function MQTTPublish(props) {
+  return [mqttPublishEffect, props];
 }

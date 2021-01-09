@@ -1,8 +1,9 @@
 {
   "name": "hyperapp-mqtt",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "MQTT sub / fx for hyperapp",
-  "main": "index.js",
+  "main": "dist/hyperappMqtt.js",
+  "module": "src/index.js",
   "scripts": {
     "clean": "npx rimraf coverage dist node_modules",
     "format": "prettier --write '{src,test}/**/*.js'",

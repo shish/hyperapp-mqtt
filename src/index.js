@@ -1,12 +1,12 @@
 import mqtt from "mqtt";
 
 var mqttConnections = {};
-// https://test.mosquitto.org
+
 export function getOpenMQTT(props) {
   var connection = mqttConnections[props.url];
   if (!connection) {
     connection = {
-      socket: mqtt.connect(props.url), // new Paho.MQTT.Client(props.url),
+      socket: mqtt.connect(props.url),
       listeners: {}
     };
     connection.socket.on("connect", function() {

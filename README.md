@@ -1,9 +1,11 @@
 HyperApp MQTT
 =============
 
-Very WIP
+Very WIP, see github issues for TODOs
 
-See github issues for TODOs
+A hyperapp `Subscriber` to connect to a MQTT-over-websockets server
+(eg Mosquitto) and react to received messages; and an `Effect` to
+send messages.
 
 Usage:
 ------
@@ -11,7 +13,7 @@ A complete chat app based on this is at https://github.com/shish/hyperapp-mqtt-c
 
 Here's the meat of the code:
 
-```
+```js
 import { h, app, text } from "hyperapp";
 import { MQTTSubscribe, MQTTPublish } from "hyperapp-mqtt";
 
@@ -36,7 +38,7 @@ const InputMessage = (state, event) => ({
 })
 
 const mqtt_subscriber = MQTTSubscribe({
-	url: mqtt_host,
+    url: mqtt_host,
     topic: mqtt_topic,
     message: (state, message) => ({
         ...state,
@@ -57,8 +59,4 @@ app({
     subscriptions: () => [mqtt_subscriber],
     node: document.getElementById("app"),
 });
-```
-
-index.html:
-```
 ```

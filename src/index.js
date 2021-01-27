@@ -3,10 +3,10 @@ import mqtt from "mqtt";
 var mqttConnections = {};
 
 export function getOpenMQTT(props) {
-  var connection = mqttConnections[props.url];
+  var connection = mqttConnections[props.url + JSON.stringify(props.options)];
   if (!connection) {
     connection = {
-      socket: mqtt.connect(props.url),
+      socket: mqtt.connect(props.url, props.options),
       connect_listeners: [],
       topic_listeners: {},
       close_listeners: []
@@ -23,7 +23,7 @@ export function getOpenMQTT(props) {
     connection.socket.on("close", function() {
       connection.close_listeners.map(l => l());
     });
-    mqttConnections[props.url] = connection;
+    mqttConnections[props.url + JSON.stringify(props.options)] = connection;
   }
   return connection;
 }
@@ -32,7 +32,7 @@ export function closeMQTT(props) {
   var connection = getOpenMQTT(props);
   // FIXME: handle close on opening
   connection.socket.end();
-  delete mqttConnections[props.url];
+  delete mqttConnections[props.url + JSON.stringify(props.options)];
 }
 
 function mqttSubscribeEffect(dispatch, props) {
@@ -65,15 +65,7 @@ export function MQTTSubscribe(props) {
 
 function mqttPublishEffect(dispatch, props) {
   var connection = getOpenMQTT(props);
-  function sendMessage() {
-    connection.socket.publish(props.topic, props.payload);
-    // connection.socket.removeEventListener("open", sendMessage);
-  }
-  //if (connection.socket.readyState === WebSocket.CONNECTING) {
-  //  connection.socket.addEventListener("open", sendMessage)
-  //} else {
-  sendMessage();
-  //}
+  connection.socket.publish(props.topic, props.payload);
 }
 
 export function MQTTPublish(props) {

@@ -4,31 +4,31 @@ import mqtt from "mqtt";
 let url = "mqtt://test.mosquitto.org/";
 let topic = "test/hyperapp-mqtt";
 let topic2 = "test/hyperapp-mqtt2";
-let payload = "hello world";
-let options = {username: 'test', password: 'test'};
+let options = { username: "test", password: "test" };
+let dispatch = { bind: (_n, x) => x };
 
 // just testing that our foundations work as expected
 describe("MQTT", () => {
   it("should open & close", done => {
-    var client = mqtt.connect(url)
-    client.on('connect', function () {
-      client.subscribe(topic, function (err) {
+    var client = mqtt.connect(url);
+    client.on("connect", function() {
+      client.subscribe(topic, function(err) {
         if (!err) {
-          client.publish(topic, 'hello from mqtt')
+          client.publish(topic, "hello from mqtt");
         }
-      })
-    })
-    client.on('message', function (topic, message) {
-      client.end()
-      done()
-    })
+      });
+    });
+    client.on("message", function() {
+      client.end();
+      done();
+    });
   });
 });
 
 // open & close
 describe("Connections", () => {
   it("should open & close", done => {
-    let props = {url, topic};
+    let props = { url, topic };
     let c = getOpenMQTT(props);
     c.socket.on("connect", function() {
       closeMQTT(props);
@@ -38,53 +38,71 @@ describe("Connections", () => {
     });
   });
   it("should cache for the same DSN", done => {
-    let props = {url, topic};
+    let props = { url, topic };
     let a = getOpenMQTT(props);
-    a.socket.on("connect", function() {closeMQTT(props);});
-    a.socket.on("close", function() {done();});
+    a.socket.on("connect", function() {
+      closeMQTT(props);
+    });
+    a.socket.on("close", function() {
+      done();
+    });
     let b = getOpenMQTT(props);
     expect(a).toEqual(b);
   });
   it("should not cache for different DSN", done => {
-    let props = {url, topic};
-    let authprops = {url, topic, options};
+    let props = { url, topic };
+    let authprops = { url, topic, options };
     let a = getOpenMQTT(props);
     a.socket.on("connect", function() {
       let b = getOpenMQTT(authprops);
       expect(a).not.toEqual(b);
-      b.socket.on("connect", function() {closeMQTT(authprops);});
-      b.socket.on("close", function() {closeMQTT(props);});
+      b.socket.on("connect", function() {
+        closeMQTT(authprops);
+      });
+      b.socket.on("close", function() {
+        closeMQTT(props);
+      });
     });
-    a.socket.on("close", function() {done();});
+    a.socket.on("close", function() {
+      done();
+    });
   });
   it("should not cache after close", done => {
-    let props = {url, topic};
+    let props = { url, topic };
     let a = getOpenMQTT(props);
     let b = null;
-    a.socket.on("connect", function() {closeMQTT(props);});
+    a.socket.on("connect", function() {
+      closeMQTT(props);
+    });
     a.socket.on("close", function() {
       b = getOpenMQTT(props);
       expect(a).not.toEqual(b);
-      b.socket.on("connect", function() {closeMQTT(props);});
-      b.socket.on("close", function() {done();});  
+      b.socket.on("connect", function() {
+        closeMQTT(props);
+      });
+      b.socket.on("close", function() {
+        done();
+      });
     });
   });
 });
 
 describe("MQTTSubscribe", () => {
   it("should subscribe and unsubscribe", done => {
-    let dispatch = {bind: (n, x) => x};
     let unsub = null;
     let sub = MQTTSubscribe({
       url,
       topic,
-      connect: () => {unsub();},
-      close: () => {done();}
+      connect: () => {
+        unsub();
+      },
+      close: () => {
+        done();
+      }
     });
     unsub = sub[0](dispatch, sub[1]);
   });
   it("should receive messages", done => {
-    let dispatch = {bind: (n, x) => x};
     let unsub = null;
     let sub = MQTTSubscribe({
       url,
@@ -93,11 +111,11 @@ describe("MQTTSubscribe", () => {
         let fx = MQTTPublish({
           url,
           topic,
-          payload: "Hello from MQTTPublish",
+          payload: "Hello from MQTTPublish"
         });
         fx[0](dispatch, fx[1]);
       },
-      message: (message) => {
+      message: message => {
         expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
         unsub();
       },
@@ -108,7 +126,6 @@ describe("MQTTSubscribe", () => {
     unsub = sub[0](dispatch, sub[1]);
   });
   it("should add new subscriptions even if open already", done => {
-    let dispatch = {bind: (n, x) => x};
     let unsub = null;
     let sub = MQTTSubscribe({
       url,
@@ -119,29 +136,29 @@ describe("MQTTSubscribe", () => {
         let sub2 = MQTTSubscribe({
           url,
           topic: topic2,
-          message: (message) => {
+          message: message => {
             // 4. when second subscription gets a message,
             // send a message to first subscription
             expect(message.payload.toString()).toEqual("Hello from inner");
             let fx2 = MQTTPublish({
               url,
               topic,
-              payload: "Hello from MQTTPublish",
+              payload: "Hello from MQTTPublish"
             });
             fx2[0](dispatch, fx2[1]);
             unsub2();
-          },
+          }
         });
         unsub2 = sub2[0](dispatch, sub2[1]);
         // 3. send message to second subscription
         let fx = MQTTPublish({
           url,
           topic: topic2,
-          payload: "Hello from inner",
+          payload: "Hello from inner"
         });
         fx[0](dispatch, fx[1]);
       },
-      message: (message) => {
+      message: message => {
         // 6. when the first subscription gets a message,
         // close
         expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
@@ -157,28 +174,24 @@ describe("MQTTSubscribe", () => {
 
 describe("MQTTPublish", () => {
   it("should publish", done => {
-
-    let c = getOpenMQTT({url});
+    let c = getOpenMQTT({ url });
     let client = c.socket;
-    client.on('connect', function () {
-      client.subscribe(topic, function (err) {
-
-        let dispatch = {bind: (n, x) => x};
+    client.on("connect", function() {
+      client.subscribe(topic, function() {
         let fx = MQTTPublish({
           url,
           topic,
-          payload: "Hello from MQTTPublish",
+          payload: "Hello from MQTTPublish"
         });
         fx[0](dispatch, fx[1]);
-    
-      })
-    })
-    client.on('message', function (topic, message) {
+      });
+    });
+    client.on("message", function(topic, message) {
       expect(message.toString()).toEqual("Hello from MQTTPublish");
-      closeMQTT({url})
-    })
-    client.on('close', function () {
-      done()
-    })
+      closeMQTT({ url });
+    });
+    client.on("close", function() {
+      done();
+    });
   });
 });

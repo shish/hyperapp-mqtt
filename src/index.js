@@ -3,76 +3,74 @@ import mqtt from "mqtt";
 var mqttConnections = {};
 
 export function getOpenMQTT(props) {
-  var connection = mqttConnections[props.url + JSON.stringify(props.options)];
-  if (!connection) {
-    connection = {
+  var c = mqttConnections[props.url + JSON.stringify(props.options)];
+  if (!c) {
+    c = {
       socket: mqtt.connect(props.url, props.options),
       connect_listeners: [],
       message_listeners: [],
       close_listeners: []
     };
-    connection.socket.on("connect", function() {
-      connection.message_listeners.map(([t, l]) =>
-        connection.socket.subscribe(t)
-      );
-      connection.connect_listeners.map(l => l());
+    c.socket.on("connect", function() {
+      c.message_listeners.map(x => c.socket.subscribe(x[0]));
+      c.connect_listeners.map(l => l());
     });
-    connection.socket.on("message", function(topic, _payload, packet) {
+    c.socket.on("message", function(topic, _payload, packet) {
       // TODO support + and # in subscriptions
-      connection.message_listeners.map(([t, l]) => t === topic && l(packet));
+      c.message_listeners.map(([t, l]) => t === topic && l(packet));
     });
-    connection.socket.on("close", function() {
-      connection.close_listeners.map(l => l());
+    c.socket.on("close", function() {
+      c.close_listeners.map(l => l());
     });
-    mqttConnections[props.url + JSON.stringify(props.options)] = connection;
+    mqttConnections[props.url + JSON.stringify(props.options)] = c;
   }
-  return connection;
+  return c;
 }
 
 export function closeMQTT(props) {
-  var connection = getOpenMQTT(props);
+  var c = getOpenMQTT(props);
   // FIXME: handle close on opening
-  connection.socket.end();
+  c.socket.end();
   delete mqttConnections[props.url + JSON.stringify(props.options)];
 }
 
 function mqttSubscribeEffect(dispatch, props) {
-  var connection = getOpenMQTT(props);
+  var c = getOpenMQTT(props);
 
   // if we created a new connection, then it included a call to subscribe
   // if we were already connected, we need to do it ourselves
-  if (connection.socket.connected) {
-    connection.socket.subscribe(props.topic);
+  if (c.socket.connected) {
+    c.socket.subscribe(props.topic);
   }
 
   let my_onmessage = null;
   if (props.message) {
     my_onmessage = [props.topic, dispatch.bind(null, props.message)];
-    connection.message_listeners.push(my_onmessage);
+    c.message_listeners.push(my_onmessage);
   }
 
   let my_onconnect = null;
   if (props.connect) {
     my_onconnect = dispatch.bind(null, props.connect);
-    connection.connect_listeners.push(my_onconnect);
+    c.connect_listeners.push(my_onconnect);
   }
 
   let my_onclose = null;
   if (props.close) {
-    my_onclose = dispatch.bind(null, props.close)
-    connection.close_listeners.push(my_onclose);
+    my_onclose = dispatch.bind(null, props.close);
+    c.close_listeners.push(my_onclose);
   }
 
   return function() {
     // Remove the listeners which we added
-    connection.message_listeners = connection.message_listeners.filter(x => x != my_onmessage);
-    connection.connect_listeners = connection.connect_listeners.filter(x => x != my_onconnect);
-    connection.close_listeners = connection.close_listeners.filter(x => x != my_onclose);
+    c.message_listeners = c.message_listeners.filter(x => x != my_onmessage);
+    c.connect_listeners = c.connect_listeners.filter(x => x != my_onconnect);
+    c.close_listeners = c.close_listeners.filter(x => x != my_onclose);
     // if no more listeners, close the socket
     if (
-      connection.message_listeners.length === 0 &&
-      connection.connect_listeners.length === 0 &&
-      connection.close_listeners.length === 0
+      c.message_listeners.length === 0 &&
+      c.connect_listeners.length === 0 &&
+      c.close_listeners.length === 0
     ) {
       closeMQTT(props);
       // if we had a close listener, then it wouldn't have been called,
@@ -89,8 +87,8 @@ export function MQTTSubscribe(props) {
 }
 
 function mqttPublishEffect(dispatch, props) {
-  var connection = getOpenMQTT(props);
-  connection.socket.publish(props.topic, props.payload);
+  var c = getOpenMQTT(props);
+  c.socket.publish(props.topic, props.payload);
 }
 
 export function MQTTPublish(props) {

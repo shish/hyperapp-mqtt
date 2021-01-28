@@ -107,7 +107,6 @@ describe("MQTTSubscribe", () => {
     });
     unsub = sub[0](dispatch, sub[1]);
   });
-  /*
   it("should add new subscriptions even if open already", done => {
     let dispatch = {bind: (n, x) => x};
     let unsub = null;
@@ -117,27 +116,27 @@ describe("MQTTSubscribe", () => {
       connect: () => {
         // 2. after connecting, make a second subscription on the same connection
         let unsub2 = null;
-        let sub = MQTTSubscribe({
+        let sub2 = MQTTSubscribe({
           url,
-          topic2,
+          topic: topic2,
           message: (message) => {
             // 4. when second subscription gets a message,
             // send a message to first subscription
             expect(message.payload.toString()).toEqual("Hello from inner");
-            let fx = MQTTPublish({
+            let fx2 = MQTTPublish({
               url,
               topic,
               payload: "Hello from MQTTPublish",
             });
-            fx[0](dispatch, fx[1]);
+            fx2[0](dispatch, fx2[1]);
             unsub2();
           },
         });
-        unsub2 = sub[0](dispatch, sub[1]);
+        unsub2 = sub2[0](dispatch, sub2[1]);
         // 3. send message to second subscription
         let fx = MQTTPublish({
           url,
-          topic2,
+          topic: topic2,
           payload: "Hello from inner",
         });
         fx[0](dispatch, fx[1]);
@@ -154,7 +153,6 @@ describe("MQTTSubscribe", () => {
     });
     unsub = sub[0](dispatch, sub[1]);
   });
-  */
 });
 
 describe("MQTTPublish", () => {

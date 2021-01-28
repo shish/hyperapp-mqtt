@@ -77,7 +77,9 @@ function mqttSubscribeEffect(dispatch, props) {
       closeMQTT(props);
       // if we had a close listener, then it wouldn't have been called,
       // because we clean up listeners before closing. So let's call it now.
-      if (my_onclose) my_onclose();
+      if (my_onclose) {
+        my_onclose();
+      }
     }
   };
 }

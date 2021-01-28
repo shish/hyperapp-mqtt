@@ -131,7 +131,8 @@ describe("MQTTSubscribe", () => {
         unsub();
       },
       error: () => {},
-      close: () => {
+      close: () => {},
+      _unsub: () => {
         done();
       }
     });
@@ -154,7 +155,7 @@ describe("MQTTSubscribe", () => {
         expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
         unsub();
       },
-      close: () => {
+      _unsub: () => {
         done();
       }
     });
@@ -199,7 +200,7 @@ describe("MQTTSubscribe", () => {
         expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
         unsub();
       },
-      close: () => {
+      _unsub: () => {
         done();
       }
     });

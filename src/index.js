@@ -12,7 +12,7 @@ export function getOpenMQTT(props) {
       close_listeners: []
     };
     connection.socket.on("connect", function() {
-      Object.keys(connection.message_listeners).map(t =>
+      connection.message_listeners.map(([t, l]) =>
         connection.socket.subscribe(t)
       );
       connection.connect_listeners.map(l => l());
@@ -68,14 +68,16 @@ function mqttSubscribeEffect(dispatch, props) {
     connection.message_listeners = connection.message_listeners.filter(x => x != my_onmessage);
     connection.connect_listeners = connection.connect_listeners.filter(x => x != my_onconnect);
     connection.close_listeners = connection.close_listeners.filter(x => x != my_onclose);
-
     // if no more listeners, close the socket
     if (
-      connection.messagt_listeners.length === 0 &&
+      connection.message_listeners.length === 0 &&
       connection.connect_listeners.length === 0 &&
       connection.close_listeners.length === 0
     ) {
       closeMQTT(props);
+      // if we had a close listener, then it wouldn't have been called,
+      // because we clean up listeners before closing. So let's call it now.
+      if (my_onclose) my_onclose();
     }
   };
 }

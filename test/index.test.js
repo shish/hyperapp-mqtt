@@ -1,10 +1,10 @@
 import { getOpenMQTT, closeMQTT, MQTTSubscribe, MQTTPublish } from "../src";
 import mqtt from "mqtt";
 
-let url = "mqtt://test.mosquitto.org/";
-let topic = "test/hyperapp-mqtt";
-let topic2 = "test/hyperapp-mqtt2";
-let options = { username: "test", password: "test" };
+let url = "mqtt://violet.shishnet.org/";
+let topic = "test/public/t1";
+let topic2 = "test/public/t2";
+let options = { username: "demo", password: "demo" };
 let dispatch = { bind: (_n, x) => x };
 
 // just testing that our foundations work as expected
@@ -87,6 +87,40 @@ describe("Connections", () => {
   });
 });
 
+describe("Authentication", () => {
+  it("should open & close anon", done => {
+    let props = { url, topic };
+    let c = getOpenMQTT(props);
+    c.socket.on("connect", function() {
+      closeMQTT(props);
+    });
+    c.socket.on("close", function() {
+      done();
+    });
+  });
+  it("should open & close authed", done => {
+    let props = { url, topic, options };
+    let c = getOpenMQTT(props);
+    c.socket.on("connect", function() {
+      closeMQTT(props);
+    });
+    c.socket.on("close", function() {
+      done();
+    });
+  });
+  it("should open & error if invalid", done => {
+    let props = { url, topic, options: { username: "asdf", password: "asdf" } };
+    let c = getOpenMQTT(props);
+    c.socket.on("connect", function() {
+      closeMQTT(props);
+    });
+    c.socket.on("error", function(e) {
+      expect(e.code).toEqual(5);
+      done();
+    });
+  });
+});
+
 describe("MQTTSubscribe", () => {
   it("should subscribe and unsubscribe", done => {
     let unsub = null;
@@ -96,6 +130,7 @@ describe("MQTTSubscribe", () => {
       connect: () => {
         unsub();
       },
+      error: () => {},
       close: () => {
         done();
       }

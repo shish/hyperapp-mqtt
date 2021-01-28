@@ -9,7 +9,8 @@ export function getOpenMQTT(props) {
       socket: mqtt.connect(props.url, props.options),
       connect_listeners: [],
       message_listeners: [],
-      close_listeners: []
+      close_listeners: [],
+      error_listeners: []
     };
     c.socket.on("connect", function() {
       c.message_listeners.map(x => c.socket.subscribe(x[0]));
@@ -18,6 +19,9 @@ export function getOpenMQTT(props) {
     c.socket.on("message", function(topic, _payload, packet) {
       // TODO support + and # in subscriptions
       c.message_listeners.map(([t, l]) => t === topic && l(packet));
+    });
+    c.socket.on("error", function(e) {
+      c.error_listeners.map(l => l(e));
     });
     c.socket.on("close", function() {
       c.close_listeners.map(l => l());
@@ -55,6 +59,12 @@ function mqttSubscribeEffect(dispatch, props) {
     c.connect_listeners.push(my_onconnect);
   }
 
+  let my_onerror = null;
+  if (props.error) {
+    my_onerror = dispatch.bind(null, props.error);
+    c.error_listeners.push(my_onerror);
+  }
+
   let my_onclose = null;
   if (props.close) {
     my_onclose = dispatch.bind(null, props.close);
@@ -65,11 +75,13 @@ function mqttSubscribeEffect(dispatch, props) {
     // Remove the listeners which we added
     c.message_listeners = c.message_listeners.filter(x => x != my_onmessage);
     c.connect_listeners = c.connect_listeners.filter(x => x != my_onconnect);
+    c.error_listeners = c.error_listeners.filter(x => x != my_onerror);
     c.close_listeners = c.close_listeners.filter(x => x != my_onclose);
     // if no more listeners, close the socket
     if (
       c.message_listeners.length === 0 &&
       c.connect_listeners.length === 0 &&
+      c.error_listeners.length === 0 &&
       c.close_listeners.length === 0
     ) {
       closeMQTT(props);

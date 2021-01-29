@@ -4,7 +4,6 @@ import mqtt from "mqtt";
 let url = "mqtt://violet.shishnet.org/";
 let topic = "test/public/t1";
 let topic2 = "test/public/t2";
-let options = { username: "demo", password: "demo" };
 let dispatch = { bind: (_n, x) => x };
 
 // just testing that our foundations work as expected
@@ -51,7 +50,7 @@ describe("Connections", () => {
   });
   it("should not cache for different DSN", done => {
     let props = { url, topic };
-    let authprops = { url, topic, options };
+    let authprops = { url, topic, username: "demo", password: "demo" };
     let a = getOpenMQTT(props);
     a.socket.on("connect", function() {
       let b = getOpenMQTT(authprops);
@@ -99,7 +98,7 @@ describe("Authentication", () => {
     });
   });
   it("should open & close authed", done => {
-    let props = { url, topic, options };
+    let props = { url, topic, username: "demo", password: "demo" };
     let c = getOpenMQTT(props);
     c.socket.on("connect", function() {
       closeMQTT(props);
@@ -109,7 +108,7 @@ describe("Authentication", () => {
     });
   });
   it("should open & error if invalid", done => {
-    let props = { url, topic, options: { username: "asdf", password: "asdf" } };
+    let props = { url, topic, username: "asdf", password: "asdf" };
     let c = getOpenMQTT(props);
     c.socket.on("connect", function() {
       closeMQTT(props);

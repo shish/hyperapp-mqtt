@@ -3,10 +3,10 @@ import mqtt from "mqtt";
 var mqttConnections = {};
 
 function getOptions(props) {
-  //let options = {};
-  //let opts = ["username", "password"];
-  //opts.map(x => {if(props[x]) {options[x] = props[x];}});
-  return props.options;
+  return {
+    username: props.username,
+    password: props.password
+  };
 }
 
 function getKey(props) {

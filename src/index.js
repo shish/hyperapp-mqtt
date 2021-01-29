@@ -2,11 +2,23 @@ import mqtt from "mqtt";
 
 var mqttConnections = {};
 
+function getOptions(props) {
+  //let options = {};
+  //let opts = ["username", "password"];
+  //opts.map(x => {if(props[x]) {options[x] = props[x];}});
+  return props.options;
+}
+
+function getKey(props) {
+  return props.url + "#" + JSON.stringify(getOptions(props));
+}
+
 export function getOpenMQTT(props) {
-  var c = mqttConnections[props.url + JSON.stringify(props.options)];
+  var key = getKey(props);
+  var c = mqttConnections[key];
   if (!c) {
     c = {
-      socket: mqtt.connect(props.url, props.options),
+      socket: mqtt.connect(props.url, getOptions(props)),
       connect_listeners: [],
       message_listeners: [],
       close_listeners: [],
@@ -26,7 +38,7 @@ export function getOpenMQTT(props) {
     c.socket.on("close", function() {
       c.close_listeners.map(l => l());
     });
-    mqttConnections[props.url + JSON.stringify(props.options)] = c;
+    mqttConnections[key] = c;
   }
   return c;
 }
@@ -35,7 +47,7 @@ export function closeMQTT(props) {
   var c = getOpenMQTT(props);
   // FIXME: handle close on opening
   c.socket.end();
-  delete mqttConnections[props.url + JSON.stringify(props.options)];
+  delete mqttConnections[getKey(props)];
 }
 
 function mqttSubscribeEffect(dispatch, props) {

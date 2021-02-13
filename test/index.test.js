@@ -1,4 +1,4 @@
-import { getOpenMQTT, closeMQTT, MQTTSubscribe, MQTTPublish } from "../src";
+import { getOpenMQTT, closeMQTT, MQTTSubscribe, MQTTPublish, topicMatches } from "../src";
 import mqtt from "mqtt";
 
 let url = "mqtt://violet.shishnet.org/";
@@ -21,6 +21,32 @@ describe("MQTT", () => {
       client.end();
       done();
     });
+  });
+});
+
+describe("topicMatches", () => {
+  it("plain match", () => {
+    expect(topicMatches("foo/bar/baz", "foo/bar/baz")).toEqual(true);
+    expect(topicMatches("foo", "foo")).toEqual(true);
+    expect(topicMatches("foo/bar/baz", "foo/bar/qux")).toEqual(false);
+    expect(topicMatches("foo/bar/baz", "foo/bar")).toEqual(false);
+    expect(topicMatches("foo/bar", "foo/bar/baz")).toEqual(false);
+  });
+  it("single-level wildcard", () => {
+    expect(topicMatches("foo/+/baz", "foo/bar/baz")).toEqual(true);
+    expect(topicMatches("+", "foo")).toEqual(true);
+    expect(topicMatches("foo/+/baz", "foo/bar/qux")).toEqual(false);
+    expect(topicMatches("foo/+/baz", "foo/bar")).toEqual(false);
+    expect(topicMatches("foo/+", "foo/bar/baz")).toEqual(false);
+  });
+  it("multi-level wildcard (only at the end)", () => {
+    expect(topicMatches("foo/#", "foo/bar/baz")).toEqual(true);
+    expect(topicMatches("#", "foo")).toEqual(true);
+    expect(topicMatches("foo/#", "bar")).toEqual(false);
+    expect(topicMatches("foo/#", "baz/foo/bar")).toEqual(false);
+    expect(topicMatches("foo/#/baz", "foo/bar/baz")).toEqual(false);
+    expect(topicMatches("foo/#/baz", "foo/bar/qux")).toEqual(false);
+    expect(topicMatches("foo/#/baz", "foo/bar")).toEqual(false);
   });
 });
 
@@ -152,6 +178,54 @@ describe("MQTTSubscribe", () => {
       },
       message: message => {
         expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
+        unsub();
+      },
+      _unsub: () => {
+        done();
+      }
+    });
+    unsub = sub[0](dispatch, sub[1]);
+  });
+  it("should match single-level wildcards", done => {
+    let unsub = null;
+    let sub = MQTTSubscribe({
+      url,
+      topic: "test/+/t1",
+      connect: () => {
+        let fx = MQTTPublish({
+          url,
+          topic: "test/public/t1",
+          payload: "Hello from MQTTPublish"
+        });
+        fx[0](dispatch, fx[1]);
+      },
+      message: message => {
+        expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
+        expect(message.topic).toEqual("test/public/t1");
+        unsub();
+      },
+      _unsub: () => {
+        done();
+      }
+    });
+    unsub = sub[0](dispatch, sub[1]);
+  });
+  it("should match multi-level wildcards", done => {
+    let unsub = null;
+    let sub = MQTTSubscribe({
+      url,
+      topic: "test/#",
+      connect: () => {
+        let fx = MQTTPublish({
+          url,
+          topic: "test/public/t1",
+          payload: "Hello from MQTTPublish"
+        });
+        fx[0](dispatch, fx[1]);
+      },
+      message: message => {
+        expect(message.payload.toString()).toEqual("Hello from MQTTPublish");
+        expect(message.topic).toEqual("test/public/t1");
         unsub();
       },
       _unsub: () => {

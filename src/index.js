@@ -13,6 +13,36 @@ function getKey(props) {
   return props.url + "#" + JSON.stringify(getOptions(props));
 }
 
+export function topicMatches(pattern, topic) {
+  if(pattern === topic) return true;
+  let pattern_parts = pattern.split("/");
+  let topic_parts = topic.split("/");
+  if(!pattern_parts.includes("+") && !pattern_parts.includes("#")) {
+    return false;
+  }
+  return matchPattern(pattern_parts, topic_parts);
+}
+
+/**
+ * @param {string[]} pattern 
+ * @param {string[]} topic 
+ */
+function matchPattern(pattern, topic) {
+  if(pattern.length === 0 && topic.length === 0) {
+    return true;
+  }
+  if(pattern.length === 0 || topic.length === 0) {
+    return false;
+  }
+  if(pattern[0] === topic[0] || pattern[0] === "+") {
+    return matchPattern(pattern.slice(1), topic.slice(1));
+  }
+  if(pattern[0] === "#" && pattern.length === 1) {
+    return true;
+  }
+  return false;
+}
+
 export function getOpenMQTT(props) {
   var key = getKey(props);
   var c = mqttConnections[key];
@@ -29,8 +59,7 @@ export function getOpenMQTT(props) {
       c.connect_listeners.map(l => l());
     });
     c.socket.on("message", function(topic, _payload, packet) {
-      // TODO support + and # in subscriptions
-      c.message_listeners.map(([t, l]) => t === topic && l(packet));
+      c.message_listeners.map(([t, l]) => topicMatches(t, topic) && l(packet));
     });
     c.socket.on("error", function(e) {
       c.error_listeners.map(l => l(e));

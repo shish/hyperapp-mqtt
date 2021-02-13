@@ -1,4 +1,10 @@
-import { getOpenMQTT, closeMQTT, MQTTSubscribe, MQTTPublish, topicMatches } from "../src";
+import {
+  getOpenMQTT,
+  closeMQTT,
+  MQTTSubscribe,
+  MQTTPublish,
+  topicMatches
+} from "../src";
 import mqtt from "mqtt";
 
 let url = "mqtt://violet.shishnet.org/";

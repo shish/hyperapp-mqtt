@@ -27,5 +27,5 @@ type PublishProps = ConnProps | {
 export declare function topicMatches(pattern: Array<string>, topic: Array<string>): boolean;
 export declare function getOpenMQTT(props: ConnProps): ConnMeta;
 export declare function closeMQTT(props: ConnProps): void;
-export declare function MQTTSubscribe(props: SubscribeProps);
-export declare function MQTTPublish(props: PublishProps);
+export declare function MQTTSubscribe(props: SubscribeProps): [CallableFunction, SubscribeProps];
+export declare function MQTTPublish(props: PublishProps): [CallableFunction, PublishProps];

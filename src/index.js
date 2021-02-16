@@ -3,10 +3,12 @@ import mqtt from "mqtt";
 var mqttConnections = {};
 
 function getOptions(props) {
-  return {
-    username: props.username,
-    password: props.password
-  };
+  return props.username && props.password
+    ? {
+        username: props.username,
+        password: props.password
+      }
+    : {};
 }
 
 function getKey(props) {

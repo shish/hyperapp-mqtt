@@ -82,7 +82,7 @@ describe("Connections", () => {
   });
   it("should not cache for different DSN", done => {
     let props = { url, topic };
-    let authprops = { url, topic, username: "demo", password: "demo" };
+    let authprops = { url, topic, username: "test", password: "test" };
     let a = getOpenMQTT(props);
     a.socket.on("connect", function() {
       let b = getOpenMQTT(authprops);
@@ -130,7 +130,7 @@ describe("Authentication", () => {
     });
   });
   it("should open & close authed", done => {
-    let props = { url, topic, username: "demo", password: "demo" };
+    let props = { url, topic, username: "test", password: "test" };
     let c = getOpenMQTT(props);
     c.socket.on("connect", function() {
       closeMQTT(props);
@@ -140,7 +140,7 @@ describe("Authentication", () => {
     });
   });
   it("should open & error if invalid", done => {
-    let props = { url, topic, username: "asdf", password: "asdf" };
+    let props = { url, topic, username: "test", password: "asdf" };
     let c = getOpenMQTT(props);
     c.socket.on("connect", function() {
       closeMQTT(props);

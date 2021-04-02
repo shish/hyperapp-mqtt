@@ -7,6 +7,7 @@ import {
 } from "../src";
 import mqtt from "mqtt";
 
+//let url = "mqtt://test.mosquitto.org/";
 let url = "mqtt://violet.shishnet.org/";
 let topic = "test/public/t1";
 let topic2 = "test/public/t2";

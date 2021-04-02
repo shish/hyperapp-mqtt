@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>MQTT Chat</title>
-		<meta name="viewport" content="width=device-width">
-		<script type="module">
+    <head>
+        <title>MQTT Chat</title>
+        <meta name="viewport" content="width=device-width">
+        <script type="module">
 import { h, text, app } from "https://unpkg.com/hyperapp";
 import { MQTTSubscribe, MQTTPublish } from "./src/index.js";
 
@@ -12,51 +12,51 @@ const mqtt_topic = "test/hyperapp-mqtt-chat";
 
 // When the user types, make a note of what they've typed
 const InputMessage = (state, event) => ({
-	...state,
-	value: event.target.value,
+    ...state,
+    value: event.target.value,
 })
 
 // When they click the "Post" button, take what they've typed
 // and send it to the MQTT server to be broadcast to all users
 const AddMessage = (state) => ([
-	{
-		...state,
-		value: "",
-	},
-	MQTTPublish({
-		url: mqtt_host,
-		topic: mqtt_topic,
-		payload: state.value
-	})
+    {
+        ...state,
+        value: "",
+    },
+    MQTTPublish({
+        url: mqtt_host,
+        topic: mqtt_topic,
+        payload: state.value
+    })
 ])
 
 // When somebody broadcasts something, display it on the page
 const mqtt_subscriber = MQTTSubscribe({
-	url: mqtt_host,
-	topic: mqtt_topic,
-	message: (state, message) => ({
-		...state,
-		messages: state.messages.concat(message.payload),
-	})
+    url: mqtt_host,
+    topic: mqtt_topic,
+    message: (state, message) => ({
+        ...state,
+        messages: state.messages.concat(message.payload),
+    })
 });
 
 app({
-	init: { messages: [], value: "" },
-	view: ({ messages, value }) =>
-		h("main", {}, [
-			h("input", { type: "text", oninput: InputMessage, value }),
-			h("button", { onclick: AddMessage }, text("Post")),
-			h("ul", {},
-				messages.map((message) => h("li", {}, text(message)))
-			),
-		]),
-	subscriptions: () => [mqtt_subscriber],
-	node: document.getElementById("app"),
+    init: { messages: [], value: "" },
+    view: ({ messages, value }) =>
+        h("main", {}, [
+            h("input", { type: "text", oninput: InputMessage, value }),
+            h("button", { onclick: AddMessage }, text("Post")),
+            h("ul", {},
+                messages.map((message) => h("li", {}, text(message)))
+            ),
+        ]),
+    subscriptions: () => [mqtt_subscriber],
+    node: document.getElementById("app"),
 });
-		</script>
-	</head>
-	<body>
-		<noscript>This page requires JavaScript</noscript>
-		<main id="app"></main>
-	</body>
+        </script>
+    </head>
+    <body>
+        <noscript>This page requires JavaScript</noscript>
+        <main id="app"></main>
+    </body>
 </html>

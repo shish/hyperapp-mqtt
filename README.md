@@ -15,7 +15,7 @@ Here's the meat of the code:
 
 ```js
 import { h, app, text } from "hyperapp";
-import { MQTTSubscribe, MQTTPublish } from "hyperapp-mqtt";
+import { MQTTSubscribe, MQTTPublish } from "@shish2k/hyperapp-mqtt";
 
 const mqtt_host = "wss://my.mqtt.host/mqtt";
 const mqtt_topic = "test/hyperapp-mqtt-chat";

@@ -1,6 +1,6 @@
 {
   "name": "@shish2k/hyperapp-mqtt",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "MQTT sub / fx for hyperapp",
   "main": "dist/hyperappMqtt.js",
   "module": "src/index.js",

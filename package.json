@@ -1,6 +1,6 @@
 {
   "name": "@shish2k/hyperapp-mqtt",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "MQTT sub / fx for hyperapp",
   "main": "dist/hyperappMqtt.js",
   "module": "src/index.js",
@@ -19,6 +19,7 @@
     "release": "./pre-flight-tests && npm run clean && npm i && ./pre-flight-tests && git tag $npm_package_version && git push && git push --tags && npm publish --tag latest --access public"
   },
   "dependencies": {
+    "hyperapp": "^2.0.19",
     "mqtt": "^4.2.6"
   },
   "devDependencies": {

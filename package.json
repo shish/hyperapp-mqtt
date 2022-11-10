@@ -1,69 +1,7 @@
 {
   "name": "@shish2k/hyperapp-mqtt",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "MQTT sub / fx for hyperapp",
-  "main": "dist/hyperappMqtt.js",
-  "module": "src/index.js",
-  "types": "types/index.d.ts",
-  "scripts": {
-    "clean": "npx rimraf coverage dist node_modules",
-    "format": "prettier --write '{src,test}/**/*.js'",
-    "format:check": "prettier --list-different {src,test}/**/*.js",
-    "lint": "eslint {src,test}/**/*.js",
-    "test": "jest --coverage --no-cache",
-    "bundle": "rollup -i src/index.js -o dist/hyperappMqtt.js -m -f umd -n hyperappMqtt",
-    "minify": "uglifyjs dist/hyperappMqtt.js -o dist/hyperappMqtt.js -mc pure_funcs=['Object.defineProperty'] --source-map includeSources,url=hyperappMqtt.js.map",
-    "check": "npm run format:check && npm run lint && npm t",
-    "build": "npm run check && npm run bundle && npm run minify",
-    "prepare": "npm run build",
-    "release": "./pre-flight-tests && npm run clean && npm i && ./pre-flight-tests && git tag $npm_package_version && git push && git push --tags && npm publish --tag latest --access public"
-  },
-  "dependencies": {
-    "hyperapp": "^2.0.19",
-    "mqtt": "^4.2.6"
-  },
-  "devDependencies": {
-    "@babel/preset-env": "^7.8.7",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-compat": "^3.5.1",
-    "jest": "^24.9.0",
-    "jsdom": "^14.1.0",
-    "prettier": "^1.19.1",
-    "rollup": "^1.32.1",
-    "uglify-es": "^3.3.9"
-  },
-  "prettier": {
-    "semi": true
-  },
-  "babel": {
-    "presets": [
-      "@babel/env"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "plugins": [
-      "compat"
-    ],
-    "parser": "babel-eslint",
-    "parserOptions": {
-      "sourceType": "module"
-    },
-    "env": {
-      "browser": true
-    },
-    "rules": {
-      "no-use-before-define": "error",
-      "compat/compat": "error",
-      "no-console": "off"
-    },
-    "settings": {
-      "polyfills": [
-        "URLSearchParams"
-      ]
-    }
-  },
   "keywords": [
     "mqtt",
     "hyperapp"
@@ -74,5 +12,52 @@
   "homepage": "https://github.com/shish/hyperapp-mqtt",
   "bugs": {
     "url": "https://github.com/shish/hyperapp-mqtt/issues"
+  },
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "dependencies": {
+    "mqtt": "^4.2.6"
+  },
+  "peerDependencies": {
+    "hyperapp": "^2.0.22"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@parcel/packager-ts": "^2.7.0",
+    "@parcel/transformer-typescript-types": "^2.7.0",
+    "@types/jest": "^29.2.2",
+    "jest": "^29.3.0",
+    "jest-environment-jsdom": "^29.3.1",
+    "jest-mock-fetch": "^2.0.5",
+    "parcel": "^2.7.0",
+    "prettier": "^2.7.1",
+    "ts-jest": "^29.0.3",
+    "typescript": "4.7"
+  },
+  "scripts": {
+    "clean": "npx rimraf coverage dist node_modules .parcel-cache",
+    "format": "prettier --write '{src,test}/**/*.{js,ts}'",
+    "test": "jest --coverage --no-cache",
+    "build": "parcel build",
+    "prepare": "npm run format && npm test && npm run build",
+    "release": "./pre-flight-tests && npm run clean && npm i && ./pre-flight-tests && git tag $npm_package_version && git push && git push --tags && npm publish --tag latest --access public"
+  },
+  "prettier": {
+    "semi": true
+  },
+  "babel": {
+    "presets": [
+      "@babel/env"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "automock": false,
+    "verbose": true,
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
   }
 }

@@ -3,8 +3,8 @@
   "version": "1.1.7",
   "description": "MQTT sub / fx for hyperapp",
   "keywords": [
-    "mqtt",
-    "hyperapp"
+    "hyperapp",
+    "mqtt"
   ],
   "author": "Shish <shish+npm@shishnet.org>",
   "license": "MIT",
@@ -30,7 +30,6 @@
     "@types/jest": "^29.2.2",
     "jest": "^29.3.0",
     "jest-environment-jsdom": "^29.3.1",
-    "jest-mock-fetch": "^2.0.5",
     "parcel": "^2.7.0",
     "prettier": "^2.7.1",
     "ts-jest": "^29.0.3",

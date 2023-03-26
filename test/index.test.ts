@@ -7,9 +7,9 @@ import {
 } from "../src";
 import mqtt_client from "u8-mqtt/cjs/index.cjs";
 
-import { TextEncoder, TextDecoder } from 'util'
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
+import { TextEncoder, TextDecoder } from "util";
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 let url_unauth = "ws://test.mosquitto.org:8080/";
 let url_auth = "ws://test.mosquitto.org:8090/";
@@ -165,8 +165,8 @@ describe("MQTTSubscribe", () => {
       connect: () => {
         unsub();
       },
-      error: () => { },
-      close: () => { },
+      error: () => {},
+      close: () => {},
       _unsub: () => {
         done();
       },

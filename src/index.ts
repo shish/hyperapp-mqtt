@@ -70,7 +70,8 @@ export function getOpenMQTT<S>(props: ConnProps): ConnMeta<S> {
       }
     }
 
-    let client = props.mqtt_client({ on_live, on_error, on_disconnect })
+    let client = props
+      .mqtt_client({ on_live, on_error, on_disconnect })
       .with_websock(props.url)
       .with_autoreconnect();
     client.connect(getOptions(props)).then();
@@ -96,7 +97,7 @@ export function closeMQTT(props: ConnProps): void {
 export function closeAll(): void {
   Object.keys(mqttConnections).forEach((key) => {
     try {
-      console.warn("Connection left open:", key)
+      console.warn("Connection left open:", key);
       mqttConnections[key].socket.disconnect();
     } finally {
       delete mqttConnections[key];

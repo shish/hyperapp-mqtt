@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width">
         <script type="module">
 import { h, text, app } from "https://unpkg.com/hyperapp";
+import mqtt_client from "https://unpkg.com/u8-mqtt/esm/web";
 import { MQTTSubscribe, MQTTPublish } from "./dist/module.js";
 
 const mqtt_host = "wss://test.mosquitto.org:8081/mqtt";
@@ -24,6 +25,7 @@ const AddMessage = (state) => ([
         value: "",
     },
     MQTTPublish({
+        mqtt_client,
         url: mqtt_host,
         topic: mqtt_topic,
         payload: state.value
@@ -32,13 +34,14 @@ const AddMessage = (state) => ([
 
 // When somebody broadcasts something, display it on the page
 const mqtt_subscriber = MQTTSubscribe({
+    mqtt_client,
     url: mqtt_host,
     topic: mqtt_topic,
     message(state, message) {
         console.log("message!");
         return {
             ...state,
-            messages: state.messages.concat(message.text()),
+            messages: state.messages.concat(message.topic + ": " + message.text()),
         };
     },
     connect(state) {

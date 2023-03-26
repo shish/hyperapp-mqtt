@@ -5,13 +5,9 @@ import type {
   Dispatch,
   Unsubscribe,
 } from "hyperapp";
-//import mqtt_client, { MQTTClient_v5 } from "u8-mqtt";
-//import mqtt_client, { MQTTClient_v5 } from "u8-mqtt/esm/web";
-import mqtt_client, { MQTTClient_v5 } from "../node_modules/u8-mqtt/esm/web/index.js";
-//import mqtt_client, { MQTTClient, pkt_api } from "u8-mqtt/cjs/index.cjs";
 
 type ConnMeta<S> = {
-  socket: typeof MQTTClient_v5;
+  socket: any;
   message_listeners: Array<(pkt: any, params: any, ctx: any) => void>;
   connect_listeners: Array<[Dispatch<S>, Dispatchable<S>]>;
   close_listeners: Array<[Dispatch<S>, Dispatchable<S>]>;
@@ -19,6 +15,7 @@ type ConnMeta<S> = {
 };
 
 type ConnProps = {
+  mqtt_client: any;
   url: string;
   username?: string;
   password?: string;
@@ -57,7 +54,7 @@ export function getOpenMQTT<S>(props: ConnProps): ConnMeta<S> {
   var key = getKey(props);
   var c = mqttConnections[key];
   if (!c) {
-    async function on_live(client, is_reconnect) {
+    async function on_live(client, is_reconnect: boolean) {
       if (is_reconnect) {
         client.connect();
       }
@@ -66,14 +63,14 @@ export function getOpenMQTT<S>(props: ConnProps): ConnMeta<S> {
     async function on_error(err, err_path) {
       c.error_listeners.map(([d, h]) => d(h, err));
     }
-    async function on_disconnect(client, intentional) {
+    async function on_disconnect(client, intentional: boolean) {
       c.close_listeners.map(([d, h]) => d(h));
       if (!intentional) {
         return client.on_reconnect();
       }
     }
 
-    let client = mqtt_client({ on_live, on_error, on_disconnect })
+    let client = props.mqtt_client({ on_live, on_error, on_disconnect })
       .with_websock(props.url)
       .with_autoreconnect();
     client.connect(getOptions(props)).then();
@@ -99,6 +96,7 @@ export function closeMQTT(props: ConnProps): void {
 export function closeAll(): void {
   Object.keys(mqttConnections).forEach((key) => {
     try {
+      console.warn("Connection left open:", key)
       mqttConnections[key].socket.disconnect();
     } finally {
       delete mqttConnections[key];

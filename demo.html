@@ -5,9 +5,9 @@
         <meta name="viewport" content="width=device-width">
         <script type="module">
 import { h, text, app } from "https://unpkg.com/hyperapp";
-import { MQTTSubscribe, MQTTPublish } from "./src/index.js";
+import { MQTTSubscribe, MQTTPublish } from "./dist/module.js";
 
-const mqtt_host = "wss://test.mosquitto.org/mqtt";
+const mqtt_host = "wss://test.mosquitto.org:8081/mqtt";
 const mqtt_topic = "test/hyperapp-mqtt-chat";
 
 // When the user types, make a note of what they've typed
@@ -34,10 +34,25 @@ const AddMessage = (state) => ([
 const mqtt_subscriber = MQTTSubscribe({
     url: mqtt_host,
     topic: mqtt_topic,
-    message: (state, message) => ({
-        ...state,
-        messages: state.messages.concat(message.payload),
-    })
+    message(state, message) {
+        console.log("message!");
+        return {
+            ...state,
+            messages: state.messages.concat(message.text()),
+        };
+    },
+    connect(state) {
+        console.log("connect!");
+        return state;
+    },
+    error(state) {
+        console.log("error!");
+        return state;
+    },
+    close(state) {
+        console.log("close!");
+        return state;
+    },
 });
 
 app({

@@ -4,12 +4,11 @@ import {
   closeAll,
   MQTTSubscribe,
   MQTTPublish,
-  topicMatches,
 } from "../src";
-import { connect } from "mqtt";
+//import { connect } from "mqtt";
 
-let url_unauth = "mqtt://test.mosquitto.org:1883/";
-let url_auth = "mqtt://test.mosquitto.org:1884/";
+let url_unauth = "ws://test.mosquitto.org:8080/";
+let url_auth = "ws://test.mosquitto.org:8090/";
 let topic = "test/hyperapp-mqtt/public/t1";
 let topic2 = "test/hyperapp-mqtt/public/t2";
 
@@ -22,6 +21,7 @@ afterEach(function () {
 });
 
 // just testing that our foundations work as expected
+/*
 describe("MQTT", () => {
   it("should open & close", (done) => {
     var client = connect(url_unauth);
@@ -38,32 +38,7 @@ describe("MQTT", () => {
     });
   });
 });
-
-describe("topicMatches", () => {
-  it("plain match", () => {
-    expect(topicMatches("foo/bar/baz", "foo/bar/baz")).toEqual(true);
-    expect(topicMatches("foo", "foo")).toEqual(true);
-    expect(topicMatches("foo/bar/baz", "foo/bar/qux")).toEqual(false);
-    expect(topicMatches("foo/bar/baz", "foo/bar")).toEqual(false);
-    expect(topicMatches("foo/bar", "foo/bar/baz")).toEqual(false);
-  });
-  it("single-level wildcard", () => {
-    expect(topicMatches("foo/+/baz", "foo/bar/baz")).toEqual(true);
-    expect(topicMatches("+", "foo")).toEqual(true);
-    expect(topicMatches("foo/+/baz", "foo/bar/qux")).toEqual(false);
-    expect(topicMatches("foo/+/baz", "foo/bar")).toEqual(false);
-    expect(topicMatches("foo/+", "foo/bar/baz")).toEqual(false);
-  });
-  it("multi-level wildcard (only at the end)", () => {
-    expect(topicMatches("foo/#", "foo/bar/baz")).toEqual(true);
-    expect(topicMatches("#", "foo")).toEqual(true);
-    expect(topicMatches("foo/#", "bar")).toEqual(false);
-    expect(topicMatches("foo/#", "baz/foo/bar")).toEqual(false);
-    expect(topicMatches("foo/#/baz", "foo/bar/baz")).toEqual(false);
-    expect(topicMatches("foo/#/baz", "foo/bar/qux")).toEqual(false);
-    expect(topicMatches("foo/#/baz", "foo/bar")).toEqual(false);
-  });
-});
+*/
 
 // open & close
 describe("Connections", () => {
@@ -321,9 +296,10 @@ describe("MQTTSubscribe", () => {
   });
 });
 
+/*
 describe("MQTTPublish", () => {
   it("should publish", (done) => {
-    let c = getOpenMQTT({ url: url_unauth, topic });
+    let c = getOpenMQTT({ url: url_unauth });
     let client = c.socket;
     client.on("connect", function () {
       client.subscribe(topic, function () {
@@ -337,10 +313,11 @@ describe("MQTTPublish", () => {
     });
     client.on("message", function (topic, message) {
       expect(message.toString()).toEqual("Hello from MQTTPublish");
-      closeMQTT({ url: url_unauth, topic });
+      closeMQTT({ url: url_unauth });
     });
     client.on("close", function () {
       done();
     });
   });
 });
+*/

@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        //"lib": ["es2021"] 
+        "target": "ES2016",
+        "moduleResolution": "node"
+    }
+}
